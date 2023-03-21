@@ -1,0 +1,16 @@
+version: '3.7'
+
+services:
+  front:
+    build: .
+    image: front:1.0
+    container_name: front
+    tty: true
+    stdin_open: true
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_LOCAL: "true"
+    volumes:
+      - .:/var/www/frontend_nextjs
+    # command: "bash -c 'npm i && npm run dev'"
