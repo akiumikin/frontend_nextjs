@@ -4,7 +4,11 @@ import '@fontsource/roboto/400.css'
 import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
 
-import { SessionProvider } from "next-auth/react";
+import { Authenticator } from '@aws-amplify/ui-react';
+import { Amplify } from 'aws-amplify';
+import awsExports from './../aws-exports';
+Amplify.configure({ ...awsExports, ssr: true });
+
 import type { AppProps } from 'next/app'
 
 import Link from '@mui/material/Link';
@@ -26,10 +30,10 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
 
   return (
     <>
-      <SessionProvider session={session}>
+      <Authenticator.Provider>
         <Component {...pageProps} />
         <Copyright sx={{ mt: 8, mb: 4 }} />
-      </SessionProvider>
+      </Authenticator.Provider>
     </>
   )
 }

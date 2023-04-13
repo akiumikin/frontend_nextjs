@@ -3,7 +3,7 @@ version: '3.7'
 services:
   front:
     build: .
-    image: front:1.0
+    image: front:1.1
     container_name: front
     tty: true
     stdin_open: true
