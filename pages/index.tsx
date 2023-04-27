@@ -1,4 +1,5 @@
-import DropdownStandard from '@/components/dropdown/standard'
+import NavbarDropdown from '@/components/dropdown/navbar'
+import SidemenuDropdown from '@/components/dropdown/sidemenu'
 
 export default function Page() {
   return (
@@ -19,84 +20,44 @@ export default function Page() {
         </div>
         <div className="navbar-menu" id="navbar-menu">
           <div className="navbar-end">
-            <DropdownStandard
-              dropdownName='Sample Menu'
-              dropdownIcon={''}
-              dropdownItems={
+            <NavbarDropdown
+              name='Sample Menu'
+              icon='mdi-menu'
+              itemsArray={
                 [
                   [
-                    {name: 'My Profile', icon: '', link: '/'},
-                    {name: 'Settings', icon: '', link: '/'},
-                    {name: 'Messages', icon: '', link: '/'}
+                    {name: 'My Profile', icon: 'mdi-account', link: '/'},
+                    {name: 'Settings', icon: 'mdi-cog-outline', link: '/'},
+                    {name: 'Messages', icon: 'mdi-email', link: '/'}
                   ],
                   [
-                    {name: 'Log Out', icon: '', link: '/'}
+                    {name: 'Log Out', icon: 'mdi-logout', link: '/'}
                   ]
                 ]
               }
             />
-            {/* <div className="navbar-item dropdown has-divider">
-              <a className="navbar-link">
-                <span className="icon"><i className="mdi mdi-menu"></i></span>
-                <span>Sample Menu</span>
-                <span className="icon">
-                  <i className="mdi mdi-chevron-down"></i>
-                </span>
-              </a>
-              <div className="navbar-dropdown">
-                <a href="profile.html" className="navbar-item">
-                  <span className="icon"><i className="mdi mdi-account"></i></span>
-                  <span>My Profile</span>
-                </a>
-                <a className="navbar-item">
-                  <span className="icon"><i className="mdi mdi-settings"></i></span>
-                  <span>Settings</span>
-                </a>
-                <a className="navbar-item">
-                  <span className="icon"><i className="mdi mdi-email"></i></span>
-                  <span>Messages</span>
-                </a>
-                <hr className="navbar-divider"/>
-                <a className="navbar-item">
-                  <span className="icon"><i className="mdi mdi-logout"></i></span>
-                  <span>Log Out</span>
-                </a>
-              </div>
-            </div> */}
-            <div className="navbar-item dropdown has-divider has-user-avatar">
-              <a className="navbar-link">
-                <div className="user-avatar">
-                  <img src="https://avatars.dicebear.com/v2/initials/john-doe.svg" alt="John Doe" className="rounded-full"/>
-                </div>
-                <div className="is-user-name"><span>John Doe</span></div>
-                <span className="icon"><i className="mdi mdi-chevron-down"></i></span>
-              </a>
-              <div className="navbar-dropdown">
-                <a href="profile.html" className="navbar-item">
-                  <span className="icon"><i className="mdi mdi-account"></i></span>
-                  <span>My Profile</span>
-                </a>
-                <a className="navbar-item">
-                  <span className="icon"><i className="mdi mdi-settings"></i></span>
-                  <span>Settings</span>
-                </a>
-                <a className="navbar-item">
-                  <span className="icon"><i className="mdi mdi-email"></i></span>
-                  <span>Messages</span>
-                </a>
-                <hr className="navbar-divider"/>
-                <a className="navbar-item">
-                  <span className="icon"><i className="mdi mdi-logout"></i></span>
-                  <span>Log Out</span>
-                </a>
-              </div>
-            </div>
+            <NavbarDropdown
+              name='John Doe'
+              avatar={{src: 'https://avatars.dicebear.com/v2/initials/akiumi-kin.svg', alt: 'avatar'}}
+              itemsArray={
+                [
+                  [
+                    {name: 'My Profile', icon: 'mdi-account', link: '/'},
+                    {name: 'Settings', icon: 'mdi-cog-outline', link: '/'},
+                    {name: 'Messages', icon: 'mdi-email', link: '/'}
+                  ],
+                  [
+                    {name: 'Log Out', icon: 'mdi-logout', link: '/'}
+                  ]
+                ]
+              }
+            />
             <a href="https://justboil.me/tailwind-admin-templates/free-dashboard/" className="navbar-item has-divider desktop-icon-only">
               <span className="icon"><i className="mdi mdi-help-circle-outline"></i></span>
               <span>About</span>
             </a>
             <a href="https://github.com/justboil/admin-one-tailwind" className="navbar-item has-divider desktop-icon-only">
-              <span className="icon"><i className="mdi mdi-github-circle"></i></span>
+              <span className="icon"><i className="mdi mdi-github"></i></span>
               <span>GitHub</span>
             </a>
             <a title="Log out" className="navbar-item desktop-icon-only">
@@ -108,11 +69,6 @@ export default function Page() {
       </nav>
 
       <aside className="aside is-placed-left is-expanded">
-        <div className="aside-tools">
-          <div>
-            Admin <b className="font-black">One</b>
-          </div>
-        </div>
         <div className="menu is-menu-main">
           <p className="menu-label">General</p>
           <ul className="menu-list">
@@ -149,25 +105,14 @@ export default function Page() {
                 <span className="menu-item-label">Login</span>
               </a>
             </li>
-            <li>
-              <a className="dropdown">
-                <span className="icon"><i className="mdi mdi-view-list"></i></span>
-                <span className="menu-item-label">Submenus</span>
-                <span className="icon"><i className="mdi mdi-plus"></i></span>
-              </a>
-              <ul>
-                <li>
-                  <a href="#void">
-                    <span>Sub-item One</span>
-                  </a>
-                </li>
-                <li>
-                  <a href="#void">
-                    <span>Sub-item Two</span>
-                  </a>
-                </li>
-              </ul>
-            </li>
+            <SidemenuDropdown
+              name='Submenus'
+              icon='mdi-view-list'
+              items={[
+                {name: 'Sub-item One', link: '/'},
+                {name: 'Sub-item Two', link: '/'},
+              ]}
+            />
           </ul>
           <p className="menu-label">About</p>
           <ul className="menu-list">
@@ -179,7 +124,7 @@ export default function Page() {
             </li>
             <li>
               <a href="https://github.com/justboil/admin-one-tailwind" className="has-icon">
-                <span className="icon"><i className="mdi mdi-github-circle"></i></span>
+                <span className="icon"><i className="mdi mdi-github"></i></span>
                 <span className="menu-item-label">GitHub</span>
               </a>
             </li>
@@ -194,7 +139,7 @@ export default function Page() {
             <li>Dashboard</li>
           </ul>
           <a href="https://github.com/justboil/admin-one-tailwind" target="_blank" className="button blue">
-            <span className="icon"><i className="mdi mdi-github-circle"></i></span>
+            <span className="icon"><i className="mdi mdi-github"></i></span>
             <span>GitHub</span>
           </a>
         </div>

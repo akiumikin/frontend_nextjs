@@ -1,4 +1,6 @@
+@tailwind components;
 
+@layer components {
   .field:not(:last-child) {
     @apply mb-3;
   }
@@ -106,7 +108,6 @@
   }
 
   .upload input[type=file] {
-    /* @apply absolute top-0 left-0 w-full h-full opacity-0 outline-none cursor-pointer -z-1; */
-    @apply absolute top-0 left-0 w-full h-full opacity-0 outline-none cursor-pointer;
+    @apply absolute top-0 left-0 w-full h-full opacity-0 outline-none cursor-pointer -z-1;
   }
-
+}
