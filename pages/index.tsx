@@ -1,7 +1,25 @@
-import NavbarDropdown from '@/components/dropdown/navbar'
+import * as React from 'react'
+
+import NavbarDropdown   from '@/components/dropdown/navbar'
 import SidemenuDropdown from '@/components/dropdown/sidemenu'
+import graphqlQuery     from '@/actions/graphql'
+
+async function getData() {
+  const query = `
+  {
+    testField
+  }
+  `
+
+  const res = await graphqlQuery(query)
+  return res
+}
 
 export default function Page() {
+  React.useEffect(() => {
+    getData()
+  },[])
+
   return (
     <>
       <nav id="navbar-main" className="navbar is-fixed-top">

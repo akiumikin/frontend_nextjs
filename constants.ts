@@ -1,4 +1,7 @@
-export enum Path {
-  Index = '/',
-  Dashboard = 'dashboard',
+const CONST = {
+  API: {
+    SERVER_HOST: 'https://server.akiumi.net/rails',
+  },
 }
+
+export default CONST
