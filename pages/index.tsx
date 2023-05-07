@@ -7,7 +7,7 @@ import graphqlQuery     from '@/actions/graphql'
 async function getData() {
   const query = `
   {
-    testField
+    connectionTest
   }
   `
 
