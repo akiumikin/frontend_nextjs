@@ -1,5 +1,5 @@
 import '@/styles/globals.css'
-import Header from '@/components/header'
+import LoginLayout from '@/components/loginLayout'
 
 import { Authenticator } from '@aws-amplify/ui-react';
 import { Amplify } from 'aws-amplify';
@@ -12,6 +12,7 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
   return (
     <>
       <Authenticator.Provider>
+        <LoginLayout />
         <Component {...pageProps} />
       </Authenticator.Provider>
     </>

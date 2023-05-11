@@ -1,5 +1,4 @@
 import * as React from 'react'
-import Image from 'next/image'
 
 interface Props {
   name: string
