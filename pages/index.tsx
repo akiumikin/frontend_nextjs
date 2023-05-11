@@ -16,27 +16,38 @@ async function getData() {
 }
 
 export default function Page() {
+  const [mobileNavMenuOpenStatus, setMobileNavMenuOpenStatus] = React.useState(false)
+  const [mobileSideMenuOpenStatus, setMobileSideMenuOpenStatus] = React.useState(false)
+
+  const onClickMobileNav = () => {
+    setMobileNavMenuOpenStatus(!mobileNavMenuOpenStatus)
+  }
+
+  const onClickMobileSideMenu = () => {
+    setMobileSideMenuOpenStatus(!mobileSideMenuOpenStatus)
+  }
+
   React.useEffect(() => {
     // getData()
   },[])
 
   return (
-    <>
+    <div className={`${mobileSideMenuOpenStatus ? 'aside-mobile-expanded' : ''}`}>
       <nav id="navbar-main" className="navbar is-fixed-top">
         <div className="navbar-brand">
-          <a className="navbar-item mobile-aside-button">
-            <span className="icon"><i className="mdi mdi-forwardburger mdi-24px"></i></span>
+          <a className="navbar-item mobile-aside-button" onClick={() => {onClickMobileSideMenu()}}>
+            <span className="icon"><i className={`mdi ${mobileSideMenuOpenStatus ? 'mdi-backburger' : 'mdi-forwardburger'} mdi-24px`}></i></span>
           </a>
           <div className="navbar-item">
             <div className="control"><input placeholder="Search everywhere..." className="input"/></div>
           </div>
         </div>
         <div className="navbar-brand is-right">
-          <a className="navbar-item --jb-navbar-menu-toggle" data-target="navbar-menu">
+          <a className="navbar-item --jb-navbar-menu-toggle" data-target="navbar-menu" onClick={() => {onClickMobileNav()}}>
             <span className="icon"><i className="mdi mdi-dots-vertical mdi-24px"></i></span>
           </a>
         </div>
-        <div className="navbar-menu" id="navbar-menu">
+        <div className={`navbar-menu${mobileNavMenuOpenStatus ? ' active' : ''}`} id="navbar-menu">
           <div className="navbar-end">
             <NavbarDropdown
               name='Sample Menu'
@@ -605,6 +616,6 @@ export default function Page() {
           </footer>
         </div>
       </div>
-    </>
+    </div>
   );
 }
