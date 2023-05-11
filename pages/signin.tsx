@@ -9,12 +9,10 @@ Amplify.configure({ ...awsExports, ssr: true });
 export default function Page() {
   return (
     <Authenticator>
-      {({ signOut, user }) => (
-        <main>
-          <h1>Hello {user?.username}</h1>
-          <button onClick={signOut}>Sign out</button>
-        </main>
-      )}
+      {({ signOut, user }) => {
+        location.href = '/'
+        return <></>
+      }}
     </Authenticator>
   );
 }

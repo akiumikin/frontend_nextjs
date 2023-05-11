@@ -1,4 +1,6 @@
 import * as React from 'react'
+import { useRouter } from 'next/router';
+import { Auth } from 'aws-amplify';
 
 import NavbarDropdown   from '@/components/dropdown/navbar'
 import SidemenuDropdown from '@/components/dropdown/sidemenu'
@@ -15,6 +17,29 @@ async function getData() {
   return res
 }
 
+const checkAuthStatus = () => {
+  (async () => {
+    try {
+      // ログイン状態の確認
+      const res = await Auth.currentAuthenticatedUser();
+      console.log(res)
+    } catch (error) {
+      // ログインしていない場合、ログイン画面にリダイレクト
+      location.href = '/signin'
+    }
+  })();
+}
+
+async function signOut() {
+  try {
+    await Auth.signOut();
+    location.href = '/signin'
+  } catch (error) {
+    console.error('error signing out: ', error);
+  }
+}
+
+
 export default function Page() {
   const [mobileNavMenuOpenStatus, setMobileNavMenuOpenStatus] = React.useState(false)
   const [mobileSideMenuOpenStatus, setMobileSideMenuOpenStatus] = React.useState(false)
@@ -27,8 +52,12 @@ export default function Page() {
     setMobileSideMenuOpenStatus(!mobileSideMenuOpenStatus)
   }
 
+  React.useLayoutEffect(() => {
+    checkAuthStatus()
+  })
+
   React.useEffect(() => {
-    // getData()
+    getData()
   },[])
 
   return (
@@ -89,7 +118,7 @@ export default function Page() {
               <span className="icon"><i className="mdi mdi-github"></i></span>
               <span>GitHub</span>
             </a>
-            <a title="Log out" className="navbar-item desktop-icon-only">
+            <a title="Log out" className="navbar-item desktop-icon-only" onClick={() => {signOut()}} style={{cursor: 'pointer'}}>
               <span className="icon"><i className="mdi mdi-logout"></i></span>
               <span>Log out</span>
             </a>
