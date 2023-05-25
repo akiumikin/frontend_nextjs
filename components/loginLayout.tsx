@@ -30,7 +30,11 @@ async function getData(cognitoId: string) {
   return res
 }
 
-export default function Page() {
+interface Props {
+  children: React.ReactNode
+}
+
+export default function Page(props: Props) {
   const userClients = React.useRef(null as any)
   const currentUser = React.useRef(null as any)
 
@@ -65,7 +69,7 @@ export default function Page() {
     })();
   })
 
-  if(!authStatus) return <></>
+  if(!authStatus) return <>{props.children}</>
 
   return (
     <>
@@ -189,6 +193,7 @@ export default function Page() {
           </div>
         </aside>
       </div>
+      <div className='loginContent'>{props.children}</div>
     </>
   )
 }

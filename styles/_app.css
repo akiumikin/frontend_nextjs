@@ -1,5 +1,9 @@
 body {
-  @apply bg-gray-50 text-base pt-14 lg:pl-60;
+  @apply pt-14;
+}
+
+.loginContent{
+  margin-left: 15rem;
 }
 
 #app {

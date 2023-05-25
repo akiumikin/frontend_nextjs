@@ -12,8 +12,9 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
   return (
     <>
       <Authenticator.Provider>
-        <LoginLayout />
-        <Component {...pageProps} />
+        <LoginLayout>
+          <Component {...pageProps} />
+        </LoginLayout>
       </Authenticator.Provider>
     </>
   )

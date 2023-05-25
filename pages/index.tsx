@@ -19,6 +19,25 @@ async function getData(cognitoId: string) {
   return res
 }
 
+import { withSSRContext } from 'aws-amplify'
+
+export async function getServerSideProps(context: any) {
+  const { Auth } = withSSRContext(context)
+  try {
+    const user = await Auth.currentAuthenticatedUser()
+    return {
+      props: { user: user.username, message: {} }
+    }
+  } catch (error) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: '/signin'
+      }
+    }
+  }
+}
+
 export default function Page() {
   const auth = React.useRef(null as any)
 
