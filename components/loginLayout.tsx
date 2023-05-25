@@ -5,8 +5,35 @@ import { signOut } from '@/actions/auth'
 
 import NavbarDropdown   from '@/components/dropdown/navbar'
 import SidemenuDropdown from '@/components/dropdown/sidemenu'
+import Select           from '@/components/form/selectField'
+
+import graphqlQuery        from '@/actions/graphql'
+
+async function getData(cognitoId: string) {
+  const query = `
+    {
+      connectionTest,
+      currentUser(cognitoId: "${cognitoId}") {
+        profile{
+          firstName
+          lastName
+        }
+        clients{
+          id
+          name
+        }
+      }
+    }
+  `
+
+  const res = await graphqlQuery(query)
+  return res
+}
 
 export default function Page() {
+  const userClients = React.useRef(null as any)
+  const currentUser = React.useRef(null as any)
+
   const [mobileNavMenuOpenStatus, setMobileNavMenuOpenStatus] = React.useState(false)
   const [mobileSideMenuOpenStatus, setMobileSideMenuOpenStatus] = React.useState(false)
   const [authStatus, setAuthStatus] = React.useState(false)
@@ -19,10 +46,18 @@ export default function Page() {
     setMobileSideMenuOpenStatus(!mobileSideMenuOpenStatus)
   }
 
+  const changeCurrentClient = (value: String) => {
+    console.log(value)
+    // location.reload()
+  }
+
   React.useLayoutEffect(() => {
     (async () => {
       try {
-        await Auth.currentAuthenticatedUser();
+        const auth = await Auth.currentAuthenticatedUser();
+        const data = await getData(auth.username)
+        currentUser.current = data.currentUser.profile
+        userClients.current = data.currentUser.clients
         setAuthStatus(true)
       } catch (error) {
         setAuthStatus(false)
@@ -51,25 +86,16 @@ export default function Page() {
           </div>
           <div className={`navbar-menu${mobileNavMenuOpenStatus ? ' active' : ''}`} id="navbar-menu">
             <div className="navbar-end">
+              {
+                userClients.current ?
+                  <Select
+                    setState={changeCurrentClient}
+                    options={userClients.current.map((c: any) => {return {label: c.name, value: c.id } })}
+                  /> : <></>
+              }
               <NavbarDropdown
-                name='Sample Menu'
-                icon='mdi-menu'
-                itemsArray={
-                  [
-                    [
-                      {name: 'My Profile', icon: 'mdi-account', link: '/'},
-                      {name: 'Settings', icon: 'mdi-cog-outline', link: '/'},
-                      {name: 'Messages', icon: 'mdi-email', link: '/'}
-                    ],
-                    [
-                      {name: 'Log Out', icon: 'mdi-logout', link: '/'}
-                    ]
-                  ]
-                }
-              />
-              <NavbarDropdown
-                name='John Doe'
-                avatar={{src: 'https://avatars.dicebear.com/v2/initials/akiumi-kin.svg', alt: 'avatar'}}
+                name={`${currentUser.current.lastName} ${currentUser.current.firstName}`}
+                avatar={{src: `https://avatars.dicebear.com/v2/initials/${currentUser.current.lastName}_${currentUser.current.firstName}.svg`, alt: 'avatar'}}
                 itemsArray={
                   [
                     [

@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import '@aws-amplify/ui-react/styles.css';
+
 /* https://github.com/justboil/admin-one-tailwind */
 @import "_app.css";
 @import "_navbar.css";

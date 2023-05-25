@@ -23,7 +23,7 @@ export default function Page(props: Props) {
               <div className="user-avatar">
                 <Image src={props.avatar.src} alt={props.avatar.alt} className="rounded-full" width={24} height={24}/>
               </div>
-              <div className="is-user-name"><span>John Doe</span></div>
+              <div className="is-user-name"><span>{props.name}</span></div>
             </> : <></>
         }
 

@@ -2,10 +2,16 @@ import * as React from 'react'
 import { checkAuthStatus } from '@/actions/auth'
 import graphqlQuery        from '@/actions/graphql'
 
-async function getData() {
+async function getData(cognitoId: string) {
   const query = `
     {
-      connectionTest
+      connectionTest,
+      currentUser(cognitoId: "${cognitoId}") {
+        clients{
+          id
+          name
+        }
+      }
     }
   `
 
@@ -14,14 +20,16 @@ async function getData() {
 }
 
 export default function Page() {
+  const auth = React.useRef(null as any)
+
   React.useLayoutEffect(() => {
     (async() => {
-      await checkAuthStatus()
+      auth.current = await checkAuthStatus()
     })();
   })
 
   React.useEffect(() => {
-    getData()
+    getData(auth.current?.username)
   },[])
 
   return (

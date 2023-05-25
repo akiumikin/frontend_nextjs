@@ -3,7 +3,9 @@ import { Auth } from 'aws-amplify';
 export async function checkAuthStatus() {
   try {
     // ログイン状態の確認
-    await Auth.currentAuthenticatedUser();
+    const auth = await Auth.currentAuthenticatedUser();
+    console.log(auth)
+    return auth
   } catch (error) {
     // ログインしていない場合、ログイン画面にリダイレクト
     location.href = '/signin'
