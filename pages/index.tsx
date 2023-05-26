@@ -1,11 +1,12 @@
 import * as React from 'react'
+import { parse } from 'cookie';
 import graphqlQuery from '@/actions/graphql'
 import type { NextPageWithLayout } from '@/pages/_app';
 import Layout, { useLoginMenuContext } from '@/components/loginLayout';
 
 import { checkAuthStatus } from '@/actions/auth'
 
-async function getData(cognitoId: string) {
+async function getData(cognitoId: string, client: string) {
   const query = `
     {
       currentUser(cognitoId: "${cognitoId}") {
@@ -18,9 +19,10 @@ async function getData(cognitoId: string) {
           name
         }
       }
-      resources(clientId: 1, cognitoId: "${cognitoId}") {
+      resources(clientId: ${client}, cognitoId: "${cognitoId}") {
         items{
           id
+          name
         }
       }
     }
@@ -33,8 +35,11 @@ async function getData(cognitoId: string) {
 export async function getServerSideProps(context: any) {
   const username = await checkAuthStatus(context)
 
+  const cookies = parse(context.req.headers.cookie || '');
+  const client = cookies.client
+
   try {
-    const data = await getData(username)
+    const data = await getData(username, client)
     return { props: { data: data || null } }
   } catch (error: any) {
     return { props: { error: error.message } }

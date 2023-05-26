@@ -9,6 +9,7 @@ interface Props {
   descriptiveText?: React.ReactNode
   isDisabled?: boolean
   placeholder?: string
+  defaultValue?: string
   options: { label: string, value: string }[]
 }
 
@@ -28,7 +29,8 @@ export default function Field(props: Props) {
       errorMessage={''}
       labelHidden={!!props.label}
       isDisabled={props.isDisabled}
-      placeholder=''
+      placeholder={props.placeholder}
+      defaultValue={props.defaultValue}
       onChange={(e) => onChangeHundle(e)}
     >
       {props.options.map((option: { label: string, value: string }, idx: number) => {

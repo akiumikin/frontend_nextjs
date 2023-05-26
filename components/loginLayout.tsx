@@ -1,5 +1,5 @@
 import * as React from 'react'
-// import { Auth } from 'aws-amplify';
+import { parse } from 'cookie'
 
 import { signOut } from '@/actions/auth'
 
@@ -18,10 +18,24 @@ export default function Page(props: Props) {
   const [menuData, setMenuData] = React.useState({
     currentUser: {
       profile: null as any,
-      clients: []
+      clients: [] as any
     },
     resources: []
   })
+
+  const clientCookie = React.useRef(undefined as string | undefined)
+
+  React.useEffect(() => {
+    const cookies = parse(document.cookie)
+    let client = cookies.client
+
+    if(!client && userClients[0]) {
+      const client = `client=${userClients[0].id};path=/`
+      document.cookie = client
+    }
+
+    clientCookie.current = client
+  },[])
 
   const currentUser = menuData.currentUser ? menuData.currentUser.profile : undefined
   const userClients = menuData.currentUser ? menuData.currentUser.clients : undefined
@@ -38,11 +52,17 @@ export default function Page(props: Props) {
   }
 
   const changeCurrentClient = (value: String) => {
-    console.log(value)
+    document.cookie = `client=${value};path=/`;
     // location.reload()
   }
 
-  if(!currentUser || !userClients) return <LoginMenuContext.Provider value={[menuData, setMenuData]}>{props.children}</LoginMenuContext.Provider>
+  if(!clientCookie.current || !currentUser || !userClients) {
+    return (
+      <LoginMenuContext.Provider value={[menuData, setMenuData]}>
+        {props.children}
+      </LoginMenuContext.Provider>
+    )
+  }
 
   return (
     <LoginMenuContext.Provider value={[menuData, setMenuData]}>
@@ -67,6 +87,7 @@ export default function Page(props: Props) {
                 <Select
                   setState={changeCurrentClient}
                   options={userClients.map((c: any) => {return {label: c.name, value: c.id } })}
+                  defaultValue={clientCookie.current}
                 />
               }
               <NavbarDropdown
