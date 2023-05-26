@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Auth } from 'aws-amplify';
+// import { Auth } from 'aws-amplify';
 
 import { signOut } from '@/actions/auth'
 
@@ -7,40 +7,27 @@ import NavbarDropdown   from '@/components/dropdown/navbar'
 import SidemenuDropdown from '@/components/dropdown/sidemenu'
 import Select           from '@/components/form/selectField'
 
-import graphqlQuery        from '@/actions/graphql'
-
-async function getData(cognitoId: string) {
-  const query = `
-    {
-      connectionTest,
-      currentUser(cognitoId: "${cognitoId}") {
-        profile{
-          firstName
-          lastName
-        }
-        clients{
-          id
-          name
-        }
-      }
-    }
-  `
-
-  const res = await graphqlQuery(query)
-  return res
-}
+const LoginMenuContext = React.createContext([{}, null as any ])
+export const useLoginMenuContext = () => React.useContext(LoginMenuContext);
 
 interface Props {
   children: React.ReactNode
 }
 
 export default function Page(props: Props) {
-  const userClients = React.useRef(null as any)
-  const currentUser = React.useRef(null as any)
+  const [menuData, setMenuData] = React.useState({
+    currentUser: {
+      profile: null as any,
+      clients: []
+    },
+    resources: []
+  })
+
+  const currentUser = menuData.currentUser ? menuData.currentUser.profile : undefined
+  const userClients = menuData.currentUser ? menuData.currentUser.clients : undefined
 
   const [mobileNavMenuOpenStatus, setMobileNavMenuOpenStatus] = React.useState(false)
   const [mobileSideMenuOpenStatus, setMobileSideMenuOpenStatus] = React.useState(false)
-  const [authStatus, setAuthStatus] = React.useState(false)
 
   const onClickMobileNav = () => {
     setMobileNavMenuOpenStatus(!mobileNavMenuOpenStatus)
@@ -55,24 +42,10 @@ export default function Page(props: Props) {
     // location.reload()
   }
 
-  React.useLayoutEffect(() => {
-    (async () => {
-      try {
-        const auth = await Auth.currentAuthenticatedUser();
-        const data = await getData(auth.username)
-        currentUser.current = data.currentUser.profile
-        userClients.current = data.currentUser.clients
-        setAuthStatus(true)
-      } catch (error) {
-        setAuthStatus(false)
-      }
-    })();
-  })
-
-  if(!authStatus) return <>{props.children}</>
+  if(!currentUser || !userClients) return <LoginMenuContext.Provider value={[menuData, setMenuData]}>{props.children}</LoginMenuContext.Provider>
 
   return (
-    <>
+    <LoginMenuContext.Provider value={[menuData, setMenuData]}>
       <div className={`${mobileSideMenuOpenStatus ? 'aside-mobile-expanded' : ''}`}>
         <nav id="navbar-main" className="navbar is-fixed-top">
           <div className="navbar-brand">
@@ -91,15 +64,14 @@ export default function Page(props: Props) {
           <div className={`navbar-menu${mobileNavMenuOpenStatus ? ' active' : ''}`} id="navbar-menu">
             <div className="navbar-end">
               {
-                userClients.current ?
-                  <Select
-                    setState={changeCurrentClient}
-                    options={userClients.current.map((c: any) => {return {label: c.name, value: c.id } })}
-                  /> : <></>
+                <Select
+                  setState={changeCurrentClient}
+                  options={userClients.map((c: any) => {return {label: c.name, value: c.id } })}
+                />
               }
               <NavbarDropdown
-                name={`${currentUser.current.lastName} ${currentUser.current.firstName}`}
-                avatar={{src: `https://avatars.dicebear.com/v2/initials/${currentUser.current.lastName}_${currentUser.current.firstName}.svg`, alt: 'avatar'}}
+                name={`${currentUser.lastName} ${currentUser.firstName}`}
+                avatar={{src: `https://avatars.dicebear.com/v2/initials/${currentUser.lastName}_${currentUser.firstName}.svg`, alt: 'avatar'}}
                 itemsArray={
                   [
                     [
@@ -194,6 +166,6 @@ export default function Page(props: Props) {
         </aside>
       </div>
       <div className='loginContent'>{props.children}</div>
-    </>
+    </LoginMenuContext.Provider>
   )
 }

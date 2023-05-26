@@ -9,8 +9,9 @@ export default async function graphqlQuery(
 ) {
   try {
     const apiEndPoint = `${CONST.API.SERVER_HOST}/graphql`
+    console.log(apiEndPoint)
     { console.info(`query: ${query}`) } // クエリの内容をコンソールに表示する
-
+    console.log(axiosPost(apiEndPoint, {query: query}))
     const res = await axiosPost(apiEndPoint, {query: query})
 
     const errorArray = getGraphqlErrors(res.data)

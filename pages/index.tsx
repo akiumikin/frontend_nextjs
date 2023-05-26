@@ -1,12 +1,18 @@
 import * as React from 'react'
-import { checkAuthStatus } from '@/actions/auth'
 import graphqlQuery        from '@/actions/graphql'
+
+import type { NextPageWithLayout } from '@/pages/_app';
+import Layout, { useLoginMenuContext } from '@/components/loginLayout';
 
 async function getData(cognitoId: string) {
   const query = `
     {
       connectionTest,
       currentUser(cognitoId: "${cognitoId}") {
+        profile{
+          firstName
+          lastName
+        }
         clients{
           id
           name
@@ -15,20 +21,22 @@ async function getData(cognitoId: string) {
     }
   `
 
-  const res = await graphqlQuery(query)
-  return res
+  try {
+    const res = await graphqlQuery(query)
+    return res
+  } catch (error: any) {
+    return error.message
+  }
 }
 
 import { withSSRContext } from 'aws-amplify'
 
 export async function getServerSideProps(context: any) {
   const { Auth } = withSSRContext(context)
+
   try {
-    const user = await Auth.currentAuthenticatedUser()
-    return {
-      props: { user: user.username, message: {} }
-    }
-  } catch (error) {
+    await Auth.currentAuthenticatedUser()
+  } catch (error: any) {
     return {
       redirect: {
         permanent: false,
@@ -36,19 +44,34 @@ export async function getServerSideProps(context: any) {
       }
     }
   }
+
+  try {
+    const user = await Auth.currentAuthenticatedUser()
+    const data = await getData(user.username)
+    return {
+      props: {
+        data: data || null,
+        message: {}
+      }
+    }
+  } catch (error: any) {
+    return {
+      props: { error: error.message }
+    }
+  }
 }
 
-export default function Page() {
-  const auth = React.useRef(null as any)
+const Page: NextPageWithLayout = (props: any) => {
+  const [menuData, setMenuData] = useLoginMenuContext();
 
   React.useLayoutEffect(() => {
-    (async() => {
-      auth.current = await checkAuthStatus()
-    })();
+    if(!props.data.currentUser) location.href = '/signin'
   })
 
   React.useEffect(() => {
-    getData(auth.current?.username)
+    (async() => {
+      setMenuData({ currentUser: props.data.currentUser })
+    })();
   },[])
 
   return (
@@ -511,3 +534,13 @@ export default function Page() {
     </>
   );
 }
+
+Page.getLayout = function getLayout(page: React.ReactElement) {
+  return (
+    <Layout>
+      {page}
+    </Layout>
+  );
+};
+
+export default Page;
