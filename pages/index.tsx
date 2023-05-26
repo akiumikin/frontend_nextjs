@@ -1,13 +1,13 @@
 import * as React from 'react'
-import graphqlQuery        from '@/actions/graphql'
-
+import graphqlQuery from '@/actions/graphql'
 import type { NextPageWithLayout } from '@/pages/_app';
 import Layout, { useLoginMenuContext } from '@/components/loginLayout';
+
+import { checkAuthStatus } from '@/actions/auth'
 
 async function getData(cognitoId: string) {
   const query = `
     {
-      connectionTest,
       currentUser(cognitoId: "${cognitoId}") {
         profile{
           firstName
@@ -18,55 +18,31 @@ async function getData(cognitoId: string) {
           name
         }
       }
+      resources(clientId: 1, cognitoId: "${cognitoId}") {
+        items{
+          id
+        }
+      }
     }
   `
 
-  try {
-    const res = await graphqlQuery(query)
-    return res
-  } catch (error: any) {
-    return error.message
-  }
+  const res = await graphqlQuery(query)
+  return res
 }
 
-import { withSSRContext } from 'aws-amplify'
-
 export async function getServerSideProps(context: any) {
-  const { Auth } = withSSRContext(context)
+  const username = await checkAuthStatus(context)
 
   try {
-    await Auth.currentAuthenticatedUser()
+    const data = await getData(username)
+    return { props: { data: data || null } }
   } catch (error: any) {
-    return {
-      redirect: {
-        permanent: false,
-        destination: '/signin'
-      }
-    }
-  }
-
-  try {
-    const user = await Auth.currentAuthenticatedUser()
-    const data = await getData(user.username)
-    return {
-      props: {
-        data: data || null,
-        message: {}
-      }
-    }
-  } catch (error: any) {
-    return {
-      props: { error: error.message }
-    }
+    return { props: { error: error.message } }
   }
 }
 
 const Page: NextPageWithLayout = (props: any) => {
   const [menuData, setMenuData] = useLoginMenuContext();
-
-  React.useLayoutEffect(() => {
-    if(!props.data.currentUser) location.href = '/signin'
-  })
 
   React.useEffect(() => {
     (async() => {

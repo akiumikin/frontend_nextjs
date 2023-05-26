@@ -1,14 +1,18 @@
-import { Auth } from 'aws-amplify';
+import { Auth, withSSRContext } from 'aws-amplify';
 
-export async function checkAuthStatus() {
+export async function checkAuthStatus(context: any) {
+  const { Auth } = withSSRContext(context)
+
   try {
-    // ログイン状態の確認
-    const auth = await Auth.currentAuthenticatedUser();
-    console.log(auth)
-    return auth
-  } catch (error) {
-    // ログインしていない場合、ログイン画面にリダイレクト
-    location.href = '/signin'
+    const user = await Auth.currentAuthenticatedUser()
+    return user.username
+  } catch (error: any) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: '/signin'
+      }
+    }
   }
 }
 
