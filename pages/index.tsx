@@ -19,7 +19,7 @@ async function getData(cognitoId: string, client: string) {
           name
         }
       }
-      resources(clientId: ${client}, cognitoId: "${cognitoId}") {
+      resources(clientId: ${client || 0}, cognitoId: "${cognitoId}") {
         items{
           id
           name

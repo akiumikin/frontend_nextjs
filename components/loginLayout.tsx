@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { parse } from 'cookie'
+import { parse, serialize } from 'cookie'
 
 import { signOut } from '@/actions/auth'
 
@@ -23,6 +23,8 @@ export default function Page(props: Props) {
     resources: []
   })
 
+  const currentUser = menuData.currentUser ? menuData.currentUser.profile : undefined
+  const userClients = menuData.currentUser ? menuData.currentUser.clients : undefined
   const clientCookie = React.useRef(undefined as string | undefined)
 
   React.useEffect(() => {
@@ -30,15 +32,12 @@ export default function Page(props: Props) {
     let client = cookies.client
 
     if(!client && userClients[0]) {
-      const client = `client=${userClients[0].id};path=/`
+      const client = serialize('client', userClients[0].id, {});
       document.cookie = client
     }
 
     clientCookie.current = client
-  },[])
-
-  const currentUser = menuData.currentUser ? menuData.currentUser.profile : undefined
-  const userClients = menuData.currentUser ? menuData.currentUser.clients : undefined
+  },[userClients])
 
   const [mobileNavMenuOpenStatus, setMobileNavMenuOpenStatus] = React.useState(false)
   const [mobileSideMenuOpenStatus, setMobileSideMenuOpenStatus] = React.useState(false)
@@ -56,7 +55,7 @@ export default function Page(props: Props) {
     // location.reload()
   }
 
-  if(!clientCookie.current || !currentUser || !userClients) {
+  if(!currentUser || !userClients) {
     return (
       <LoginMenuContext.Provider value={[menuData, setMenuData]}>
         {props.children}

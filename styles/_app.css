@@ -3,7 +3,7 @@ body {
 }
 
 .loginContent{
-  margin-left: 15rem;
+  @apply lg:pl-60;
 }
 
 #app {
