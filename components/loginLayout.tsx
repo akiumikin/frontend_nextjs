@@ -17,6 +17,7 @@ interface Props {
 
 export default function Page(props: Props) {
   const [menuData, setMenuData] = React.useState({
+    unlessFetch: true,
     currentUser: {
       profile: null as any,
       clients: [] as any
@@ -28,6 +29,7 @@ export default function Page(props: Props) {
   const userClients = menuData.currentUser ? menuData.currentUser.clients : undefined
   const clientCookie = React.useRef(undefined as string | undefined)
 
+  // Cookieにメニューの表示情報や選択済みの企業のIDを格納してページ遷移しても使いまわせるようにする
   React.useEffect(() => {
     const cookies = parse(document.cookie)
     let client = cookies.client
@@ -38,6 +40,11 @@ export default function Page(props: Props) {
     }
 
     clientCookie.current = client
+
+    const menuDataFromCookie = cookies.menuData ? JSON.parse(cookies.menuData) : undefined
+    if(menuData.unlessFetch && menuDataFromCookie) {
+      setMenuData(menuDataFromCookie)
+    }
   },[userClients])
 
   const [mobileNavMenuOpenStatus, setMobileNavMenuOpenStatus] = React.useState(false)

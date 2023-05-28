@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { parse } from 'cookie';
+import { parse, serialize } from 'cookie';
 import graphqlQuery from '@/actions/graphql'
 import type { NextPageWithLayout } from '@/pages/_app';
 import Layout, { useLoginMenuContext } from '@/components/loginLayout';
@@ -50,14 +50,18 @@ const Page: NextPageWithLayout = (props: any) => {
   const [menuData, setMenuData] = useLoginMenuContext();
 
   React.useEffect(() => {
-    (async() => { setMenuData(props.data) })();
+    (async() => {
+      const data = JSON.stringify(props.data)
+      document.cookie = serialize('menuData', data)
+      setMenuData(props.data)
+    })();
   },[])
 
   return (
     <>
       <h2>製作中</h2>
       <h4>ダッシュボード</h4>
-      {/* <section className="is-title-bar">
+      <section className="is-title-bar">
         <div className="flex flex-col md:flex-row items-center justify-between space-y-6 md:space-y-0">
           <ul>
             <li>Admin</li>
@@ -484,7 +488,7 @@ const Page: NextPageWithLayout = (props: any) => {
             <button className="button blue --jb-modal-close">Confirm</button>
           </footer>
         </div>
-      </div> */}
+      </div>
     </>
   );
 }
