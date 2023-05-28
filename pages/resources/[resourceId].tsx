@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useRouter } from "next/router";
 import { parse } from 'cookie';
 import graphqlQuery from '@/actions/graphql'
 import type { NextPageWithLayout } from '@/pages/_app';
@@ -47,6 +48,9 @@ export async function getServerSideProps(context: any) {
 }
 
 const Page: NextPageWithLayout = (props: any) => {
+  const router = useRouter();
+  const resourceId = router.query.resourceId;
+
   const [menuData, setMenuData] = useLoginMenuContext();
 
   React.useEffect(() => {
@@ -56,7 +60,7 @@ const Page: NextPageWithLayout = (props: any) => {
   return (
     <>
       <h2>製作中</h2>
-      <h4>ダッシュボード</h4>
+      <h4>個別リソースの一覧　ID: {resourceId}</h4>
       {/* <section className="is-title-bar">
         <div className="flex flex-col md:flex-row items-center justify-between space-y-6 md:space-y-0">
           <ul>

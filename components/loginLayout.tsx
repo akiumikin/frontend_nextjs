@@ -4,8 +4,9 @@ import { parse, serialize } from 'cookie'
 import { signOut } from '@/actions/auth'
 
 import NavbarDropdown   from '@/components/dropdown/navbar'
-import SidemenuDropdown from '@/components/dropdown/sidemenu'
+// import SidemenuDropdown from '@/components/dropdown/sidemenu'
 import Select           from '@/components/form/selectField'
+import Link from 'next/link'
 
 const LoginMenuContext = React.createContext([{}, null as any ])
 export const useLoginMenuContext = () => React.useContext(LoginMenuContext);
@@ -20,7 +21,7 @@ export default function Page(props: Props) {
       profile: null as any,
       clients: [] as any
     },
-    resources: []
+    resources: {count: 0, items: [{} as any]}
   })
 
   const currentUser = menuData.currentUser ? menuData.currentUser.profile : undefined
@@ -50,9 +51,10 @@ export default function Page(props: Props) {
     setMobileSideMenuOpenStatus(!mobileSideMenuOpenStatus)
   }
 
-  const changeCurrentClient = (value: String) => {
-    document.cookie = `client=${value};path=/`;
-    // location.reload()
+  const changeCurrentClient = (value: string) => {
+    const client = serialize('client', value, {});
+    document.cookie = client
+    location.reload()
   }
 
   if(!currentUser || !userClients) {
@@ -62,7 +64,7 @@ export default function Page(props: Props) {
       </LoginMenuContext.Provider>
     )
   }
-
+console.log(menuData)
   return (
     <LoginMenuContext.Provider value={[menuData, setMenuData]}>
       <div className={`${mobileSideMenuOpenStatus ? 'aside-mobile-expanded' : ''}`}>
@@ -125,58 +127,97 @@ export default function Page(props: Props) {
           <div className="menu is-menu-main">
             <p className="menu-label">General</p>
             <ul className="menu-list">
-              <li className="active">
-                <a href="index.html">
-                  <span className="icon"><i className="mdi mdi-desktop-mac"></i></span>
-                  <span className="menu-item-label">Dashboard</span>
-                </a>
+              <li>
+                <Link href='/'>
+                  <span className="icon"><i className="mdi mdi-view-dashboard"></i></span>
+                  <span className="menu-item-label">ダッシュボード</span>
+                </Link>
               </li>
             </ul>
-            <p className="menu-label">Examples</p>
+            <p className="menu-label">Resources</p>
             <ul className="menu-list">
-              <li className="--set-active-tables-html">
-                <a href="tables.html">
-                  <span className="icon"><i className="mdi mdi-table"></i></span>
-                  <span className="menu-item-label">Tables</span>
-                </a>
-              </li>
-              <li className="--set-active-forms-html">
-                <a href="forms.html">
-                  <span className="icon"><i className="mdi mdi-square-edit-outline"></i></span>
-                  <span className="menu-item-label">Forms</span>
-                </a>
-              </li>
-              <li className="--set-active-profile-html">
-                <a href="profile.html">
-                  <span className="icon"><i className="mdi mdi-account-circle"></i></span>
-                  <span className="menu-item-label">Profile</span>
-                </a>
-              </li>
-              <li>
-                <a href="login.html">
-                  <span className="icon"><i className="mdi mdi-lock"></i></span>
-                  <span className="menu-item-label">Login</span>
-                </a>
-              </li>
-              <SidemenuDropdown
+              {menuData.resources.items.map((resource: {id: number, name: string}, idx: number) => {
+                return(
+                  <li key={`resources_${idx}`}>
+                    <Link href={`/resources/${resource.id}`}>
+                      <span className="icon"><i className="mdi mdi-database-outline"></i></span>
+                      <span className="menu-item-label">{resource.name}</span>
+                    </Link>
+                  </li>
+                )
+              })}
+
+              {/* <SidemenuDropdown
                 name='Submenus'
                 icon='mdi-view-list'
                 items={[
                   {name: 'Sub-item One', link: '/'},
                   {name: 'Sub-item Two', link: '/'},
                 ]}
-              />
+              /> */}
+            </ul>
+            <p className="menu-label">Manage</p>
+            <ul className="menu-list">
+              <li>
+                <Link href='/manage/users'>
+                  <span className="icon"><i className="mdi mdi-account-multiple"></i></span>
+                  <span className="menu-item-label">ユーザー</span>
+                </Link>
+              </li>
+            </ul>
+            <ul className="menu-list">
+              <li>
+                <Link href='/manage/resources'>
+                  <span className="icon"><i className="mdi mdi-data-matrix"></i></span>
+                  <span className="menu-item-label">リソース</span>
+                </Link>
+              </li>
+            </ul>
+            <ul className="menu-list">
+              <li>
+                <Link href='/manage/flows'>
+                  <span className="icon"><i className="mdi mdi-clipboard-flow-outline"></i></span>
+                  <span className="menu-item-label">フロー</span>
+                </Link>
+              </li>
+            </ul>
+            <ul className="menu-list">
+              <li>
+                <Link href='/manage/tags'>
+                  <span className="icon"><i className="mdi mdi-tag-outline"></i></span>
+                  <span className="menu-item-label">タグ</span>
+                </Link>
+              </li>
+            </ul>
+            <ul className="menu-list">
+              <li>
+                <Link href='/manage/system/logs'>
+                  <span className="icon"><i className="mdi mdi-file-cog-outline"></i></span>
+                  <span className="menu-item-label">システムログ</span>
+                </Link>
+              </li>
+            </ul>
+            <p className="menu-label">Personal</p>
+            <ul className="menu-list">
+              <li>
+                <Link href='/profile'>
+                  <span className="icon"><i className="mdi mdi-account-outline"></i></span>
+                  <span className="menu-item-label">プロフィール</span>
+                </Link>
+              </li>
+            </ul>
+            <ul className="menu-list">
+              <li>
+                <a className="has-icon" onClick={() => {signOut()}} style={{cursor: 'pointer'}}>
+                  <span className="icon"><i className="mdi mdi-logout"></i></span>
+                  <span className="menu-item-label">ログアウト</span>
+                </a>
+              </li>
             </ul>
             <p className="menu-label">About</p>
             <ul className="menu-list">
               <li>
-                <a href="https://justboil.me/tailwind-admin-templates/free-dashboard/" className="has-icon">
-                  <span className="icon"><i className="mdi mdi-help-circle"></i></span>
-                  <span className="menu-item-label">About</span>
-                </a>
-              </li>
-              <li>
-                <a href="https://github.com/justboil/admin-one-tailwind" className="has-icon">
+                <a href="https://github.com/akiumikin/frontend_nextjs" className="has-icon" target='_blank'>
                   <span className="icon"><i className="mdi mdi-github"></i></span>
                   <span className="menu-item-label">GitHub</span>
                 </a>

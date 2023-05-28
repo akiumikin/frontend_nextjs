@@ -56,7 +56,7 @@ const Page: NextPageWithLayout = (props: any) => {
   return (
     <>
       <h2>製作中</h2>
-      <h4>ダッシュボード</h4>
+      <h4>システムログ一覧（管理専用画面）</h4>
       {/* <section className="is-title-bar">
         <div className="flex flex-col md:flex-row items-center justify-between space-y-6 md:space-y-0">
           <ul>
