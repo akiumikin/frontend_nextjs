@@ -4,4 +4,13 @@ const CONST = {
   },
 }
 
+export const serverEnum = {
+  users: {
+    role: {
+      admin: '管理者',
+      normal: '一般'
+    } as any
+  }
+}
+
 export default CONST

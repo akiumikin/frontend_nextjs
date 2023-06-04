@@ -25,8 +25,8 @@ export default function Page(props: Props) {
     resources: {count: 0, items: [{} as any]}
   })
 
-  const currentUser = menuData.currentUser ? menuData.currentUser.profile : undefined
-  const userClients = menuData.currentUser ? menuData.currentUser.clients : undefined
+  const currentUser = menuData && menuData.currentUser ? menuData.currentUser.profile : undefined
+  const userClients = menuData && menuData.currentUser ? menuData.currentUser.clients : undefined
   const clientCookie = React.useRef(undefined as string | undefined)
 
   // Cookieにメニューの表示情報や選択済みの企業のIDを格納してページ遷移しても使いまわせるようにする
@@ -34,7 +34,7 @@ export default function Page(props: Props) {
     const cookies = parse(document.cookie)
     let client = cookies.client
 
-    if(!client && userClients[0]) {
+    if(!client && userClients && userClients[0]) {
       const client = serialize('client', userClients[0].id, {});
       document.cookie = client
     }
@@ -42,7 +42,7 @@ export default function Page(props: Props) {
     clientCookie.current = client
 
     const menuDataFromCookie = cookies.menuData ? JSON.parse(cookies.menuData) : undefined
-    if(menuData.unlessFetch && menuDataFromCookie) {
+    if(menuData && menuData.unlessFetch && menuDataFromCookie) {
       setMenuData(menuDataFromCookie)
     }
   },[userClients])
@@ -71,7 +71,7 @@ export default function Page(props: Props) {
       </LoginMenuContext.Provider>
     )
   }
-console.log(menuData)
+
   return (
     <LoginMenuContext.Provider value={[menuData, setMenuData]}>
       <div className={`${mobileSideMenuOpenStatus ? 'aside-mobile-expanded' : ''}`}>
