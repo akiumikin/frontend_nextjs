@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { useRouter } from "next/router";
+import { useRouter } from "next/router"
+import Image from 'next/image'
 import { parse } from 'cookie';
 import graphqlQuery from '@/actions/graphql'
 import type { NextPageWithLayout } from '@/pages/_app';
@@ -24,6 +25,12 @@ async function getData(cognitoId: string, client: string, resourceId: string) {
         items {
           id
           name
+          fields {
+            id
+            name
+            orderIndex
+            inputType
+          }
           items {
             id
             status
@@ -31,7 +38,12 @@ async function getData(cognitoId: string, client: string, resourceId: string) {
               id
               version
               value
-              field
+              field{
+                id
+                name
+                orderIndex
+                inputType
+              }
             }
             steps {
               orderIndex
@@ -39,7 +51,12 @@ async function getData(cognitoId: string, client: string, resourceId: string) {
                 id
                 version
                 value
-                field
+                field{
+                  id
+                  name
+                  orderIndex
+                  inputType
+                }
               }
             }
           }
@@ -71,6 +88,16 @@ export async function getServerSideProps(context: any) {
 
 const Page: NextPageWithLayout = (props: any) => {
   const router = useRouter();
+  const resource = props.data.resources.items[0]
+  const FIELD_VIEW_REMIT = 4
+
+  const sortedFields = props.data.resources.items[0].fields.sort((a: any, b: any) => a.order_index - b.order_index)
+  const fieldKeys = sortedFields.map((item: any) => item.name);
+
+  const getValueFromFieldKey = (objArray: any[], key: string) => {
+    const obj = objArray.find((obj: any) => { return obj.field.name == key })
+    return obj ? obj.value : null
+  }
 
   return (
     <>
@@ -78,7 +105,7 @@ const Page: NextPageWithLayout = (props: any) => {
         <div className="flex flex-col md:flex-row items-center justify-between space-y-6 md:space-y-0">
           <ul>
             <li>Resources</li>
-            <li>{props.data.resources.items[0].name}一覧</li>
+            <li>{resource.name}一覧</li>
           </ul>
         </div>
       </section>
@@ -88,7 +115,7 @@ const Page: NextPageWithLayout = (props: any) => {
           <header className="card-header">
             <p className="card-header-title">
               <span className="icon"><i className="mdi mdi-database-outline"></i></span>
-              {props.data.resources.items[0].name}一覧
+              {resource.name}一覧
             </p>
             <a className="card-header-icon" onClick={() => { router.push(window.location.pathname + window.location.search) }} style={{cursor: 'pointer'}}>
               <span className="icon"><i className="mdi mdi-reload"></i></span>
@@ -101,44 +128,43 @@ const Page: NextPageWithLayout = (props: any) => {
                 <tr>
                   <th></th>
                   <th>ID</th>
-                  <th>フロー名</th>
-                  <th>利用状況<br/>[リード/有効/完了/保留/終了]</th>
+                  {
+                    fieldKeys.map((key: any, idx: number) => {
+                      if (idx >= FIELD_VIEW_REMIT) return<></>
+                      return <th key={`field_${idx}`}>{key}</th>
+                    })
+                  }
                   <th></th>
                 </tr>
               </thead>
               <tbody>
-                {/* {props.data.resources.items.map((resource: any) => {
-                  const flow = resource.flow
-
-                  return(
-                    <tr key={`resource_${resource.id}`}>
-                      <td className="image-cell">
-                        <div className="image">
-                          <Image
-                            src={`https://avatars.dicebear.com/v2/initials/${resource.name}.svg`}
-                            alt={`resource icon ${resource.name}`}
-                            className="rounded-full"
-                            width={24}
-                            height={24}
-                          />
-                        </div>
-                      </td>
-                      <td data-label="Name">{resource.name}</td>
-                      <td data-label="Flow">{flow.name}</td>
-                      <td data-label="Counts">{'0 / 0 / 0 / 0 / 0'}</td>
-                      <td className="actions-cell">
-                        <div className="buttons right nowrap">
-                          <button className="button small blue --jb-modal"  data-target="sample-modal-2" type="button">
-                            <span className="icon"><i className="mdi mdi-eye"></i></span>
-                          </button>
-                          <button className="button small red --jb-modal" data-target="sample-modal" type="button">
-                            <span className="icon"><i className="mdi mdi-trash-can"></i></span>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  )
-                })} */}
+                {
+                  resource.items.map((item: any, idx: number) => {
+                    return (
+                      <tr key={`item_${idx}`}>
+                        <td className="image-cell">
+                          <div className="image">
+                            <Image
+                              src={`https://avatars.dicebear.com/v2/initials/${item.values[0].value}.svg`}
+                              alt={`resource icon ${idx + 1}`}
+                              className="rounded-full"
+                              width={24}
+                              height={24}
+                            />
+                          </div>
+                        </td>
+                        <td>{item.id}</td>
+                        {
+                          fieldKeys.map((key: any, idx: number) => {
+                            if (idx >= FIELD_VIEW_REMIT) return<></>
+                            return <td key={`field_${idx}`}>{getValueFromFieldKey(item.values, key)}</td>
+                          })
+                        }
+                        <td></td>
+                      </tr>
+                    )
+                  })
+                }
               </tbody>
             </table>
           </div>

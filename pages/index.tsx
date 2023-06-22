@@ -1,10 +1,12 @@
 import * as React from 'react'
+import { useRouter } from 'next/router';
 import { parse, serialize } from 'cookie';
 import graphqlQuery from '@/actions/graphql'
 import type { NextPageWithLayout } from '@/pages/_app';
 import Layout, { useLoginMenuContext } from '@/components/loginLayout';
 
 import { checkAuthStatus } from '@/actions/auth'
+import { signOut } from '@/actions/auth'
 
 async function getData(cognitoId: string, client: string) {
   const query = `
@@ -47,6 +49,9 @@ export async function getServerSideProps(context: any) {
 }
 
 const Page: NextPageWithLayout = (props: any) => {
+  const router = useRouter();
+  if(!props.data) { signOut() }
+
   const [menuData, setMenuData] = useLoginMenuContext();
 
   React.useEffect(() => {
@@ -56,6 +61,8 @@ const Page: NextPageWithLayout = (props: any) => {
       setMenuData(props.data)
     })();
   },[])
+
+  if(menuData.unlessFetch) return <></>
 
   return (
     <>
